@@ -66,8 +66,7 @@ const userSchema = new mongoose.Schema({
     required: false,
   },
   diocessse: {
-    type: String,
-    required: true,
+    type: String
   },
   password: {
     type: String,
@@ -215,11 +214,16 @@ function validateUser(user) {
       .max(50)
       .required(),
     gender: Joi.string()
+      .only(["male", "female"])
       .required(),
     password: Joi.string()
       .min(5)
       .max(255)
+      .required(),
+    confirmPassword: Joi
+      .any().valid(Joi.ref('password'))
       .required()
+      .options({language: {any: {allowOnly: 'must match password'}}})
     // type: Joi.string().valid(["teacher", "student", "sponsor", "schoolAdmin", "admin", "globalAdmin"])
 
   };
@@ -227,5 +231,10 @@ function validateUser(user) {
   return Joi.validate(user, schema, { allowUnknown: true });
 }
 
+function isValidObjectId(objectId){
+  return mongoose.Types.ObjectId.isValid(objectId)  === true;
+}
+
 exports.User = User;
 exports.validate = validateUser;
+exports.isValidObjectId = isValidObjectId;

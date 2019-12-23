@@ -1,7 +1,6 @@
 const auth = require("../middleware/auth");
-const bcrypt = require('bcryptjs');
 const _ = require("lodash");
-const { User, validate } = require("../db/models/user");
+const { User, validate, isValidObjectId } = require("../db/models/user");
 const express = require("express");
 const router = express.Router();
 
@@ -11,28 +10,31 @@ router.get("/me", auth, async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  console.log("body", req.body);
 
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   let user = await User.findOne({ email: req.body.email });
-  if (user) return res.status(400).send("User already registered.");
+  if (user) return res.status(400).send(`User '${req.body.email}' already registered.`);
 
-  user = new User(_.pick(req.body, ["name", "email", "password"]));
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(user.password, salt);
+  user = new User(req.body);
+  // console.log("body", user);
+
   await user.save();
 
-  const token = user.generateAuthToken();
-  res
-    .header("x-auth-token", token)
-    .send(_.pick(user, ["_id", "name", "email"]));
+  res.status(201).json({
+    status: 'success',
+    message: "User successfully created"
+  });
 });
 
 router.get("/", async (req, res) => {
   const users = await User.find().sort("email");
-  res.send(users);
+  res.status(201).json({
+    status: 'success',
+    count: users.length,
+    data: users
+  });
 });
 
 
@@ -40,34 +42,52 @@ router.put("/:id", async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
+  if (!isValidObjectId(req.params.id)) return res.status(400).json({ status: 'error', message: "invalid user id supplied" });
+
   const user = await User.findByIdAndUpdate(
     req.params.id,
     {
-      name: req.body.name
+      lastName: req.body.lastName,
+      firstName: req.body.firstName,
+      otherNames: req.body.otherNames,
+      title: req.body.title,
+      email: req.body.email,
+      phoneNumber: req.body.phoneNumber,
+      photo: req.body.photo,
+      parish: req.body.parish,
+      station: req.body.station,
+      diocessse: req.body.diocessse,
     },
     { new: true }
   );
 
   if (!user)
-    return res.status(404).send("The user with the given ID was not found.");
-
-  res.send(user);
+    return res.status(404).json({ status: "error", message: "The user with the given ID was not found." });
+    delete user.password
+  res.status(201).json({
+    status: 'success',
+    message: "User successfully updated",
+    data: user
+  });
 });
 
-router.delete("/:id",  async (req, res) => {
+router.delete("/:id", async (req, res) => {
+  if (!isValidObjectId(req.params.id)) return res.status(400).json({ status: 'error', message: "invalid user id supplied" });
   const user = await User.findByIdAndRemove(req.params.id);
 
   if (!user)
-    return res.status(404).send("The user with the given ID was not found.");
+    return res.status(404).json({ status: 'error', message: "invalid user id supplied" });
 
   res.send(user);
 });
 
 router.get("/:id", async (req, res) => {
+
+  if (!isValidObjectId(req.params.id)) return res.status(400).json({ status: 'error', message: "invalid user id supplied" });
   const user = await User.findById(req.params.id).select("-__v");
 
   if (!user)
-    return res.status(404).send("The user with the given ID was not found.");
+    return res.status(404).json({ status: 'error', message: "invalid user id supplied" });
   res.send(user);
 });
 

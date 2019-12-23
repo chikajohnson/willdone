@@ -1,11 +1,11 @@
 const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
-const {User, validate} = require('../db/models/user');
+const { User, validate } = require('../db/models/user');
 const catchAsync = require('../utility/catchAsync');
-const Gmailer =  require('../utility/gmailer');
+const Gmailer = require('../utility/gmailer');
 
-const signToken = ({id, }) => {
+const signToken = ({ id, }) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
@@ -39,7 +39,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  
+
   const newUser = {
     title: req.body.title,
     lastName: req.body.lastName,
@@ -52,7 +52,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     gender: req.body.gender,
     parish: req.body.parish,
     station: req.body.station,
-    diocesse: req.body.diocesse,
+    diocese: req.body.diocese
   };
 
 
@@ -63,7 +63,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   if (user) return res.status(400).send(`User with phonenumber ${req.body.phoneNumber} already exists.`);
 
   user = new User(newUser);
-  await user.save();  
+  await user.save();
 
   createSendToken(user, 201, req, res);
 });
