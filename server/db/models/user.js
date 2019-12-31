@@ -1,6 +1,4 @@
-const config = require("config");
-const jwt = require("jsonwebtoken");
-const Joi = require('joi');
+const validator = require('validator');
 const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
@@ -8,58 +6,54 @@ const crypto = require('crypto');
 const userSchema = new mongoose.Schema({
   lastName: {
     type: String,
-    required: true,
-    minlength: 2,
+    required: [true, "Last name is required"],
     maxlength: 50
   },
   firstName: {
     type: String,
-    required: true,
-    minlength: 2,
+    required: [true, "First name is required"],
     maxlength: 50
   },
   otherNames: {
     type: String,
     required: false,
-    minlength: 2,
     maxlength: 100
   },
   title: {
     type: String,
-    required: true,
-    minlength: 2,
+    required: [true, "Title is required"],
     maxlength: 10
   },
   email: {
     type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 255,
-    unique: true
+    required: [true, "Email is required"],
+    unique: true,
+    lowercase: true,
+    validate: [validator.isEmail, 'Please provide a valid email']
   },
   phoneNumber: {
     type: String,
-    required: true,
+    required: [true, "Phone is required"],
     minlength: 6,
     maxlength: 15,
     unique: true
   },
   photo: {
     type: String,
-    required: false
+    default: 'default.jpg'
   },
   gender: {
     type: String,
-    required: true,
+    required: [true, "Specify your gender"],
     enum: ["female", "male"],
   },
   placeOfBirth: {
     type: String,
-    required: true,
+    required: [true, "Place of birth is required"],
   },
   parish: {
     type: String,
-    required: true,
+    required: [true, "Enter the name of your parish"],
   },
   station: {
     type: String,
@@ -70,9 +64,9 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
-    minlength: 5,
-    maxlength: 1024
+    required: [true, "Password is required"],
+    minlength: 8,
+    select: false
   },
   confirmPassword: {
     type: String,
@@ -93,25 +87,23 @@ const userSchema = new mongoose.Schema({
     default: false,
     select: false
   },
-  type: {
+  role: {
     type: String,
-    enum: ["clergy", "lay", "sponsor", "school", "admin", "globalAdmin"],
-    default: "admin"
+    enum: ["clergy", "lay", "user", "admin", "globalAdmin"],
+    default: "lay"
   }
 });
 
 
 userSchema.pre('save', async function (next) {
-  console.log("about to save");
-
   // Only run this function if password was actually modified
   if (!this.isModified('password')) return next();
 
   // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
 
-  // Delete confirmPassword field
-  this.confirmPassword = undefined;
+  // Delete passwordConfirm field
+  this.passwordConfirm = undefined;
   next();
 });
 
@@ -164,77 +156,12 @@ userSchema.methods.createPasswordResetToken = function () {
   return resetToken;
 };
 
-userSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign(
-    {
-      _id: this._id,
-      name: this.name,
-      email: this.email,
-      type: this.type
-    },
-    config.get("jwtPrivateKey")
-  );
-  return token;
-};
-
 userSchema.methods.generateActivationCode = function () {
   //generate 6 character random code
   const code = crypto.randomBytes(6).toString();
   return code;
 };
 
-const User = mongoose.model("users", userSchema);
-
-function validateUser(user) {
-  const schema = {
-    title: Joi.string()
-      .min(2)
-      .max(50)
-      .required(),
-    firstName: Joi.string()
-      .min(2)
-      .max(50)
-      .required(),
-    lastName: Joi.string()
-      .min(2)
-      .max(50)
-      .required(),
-    email: Joi.string()
-      .min(5)
-      .max(255)
-      .required()
-      .email(),
-    phoneNumber: Joi.string().max(15).min(6).required(),
-    placeOfBirth: Joi.string()
-      .min(2)
-      .max(50)
-      .required(),
-    parish: Joi.string()
-      .min(2)
-      .max(50)
-      .required(),
-    gender: Joi.string()
-      .only(["male", "female"])
-      .required(),
-    password: Joi.string()
-      .min(5)
-      .max(255)
-      .required(),
-    confirmPassword: Joi
-      .any().valid(Joi.ref('password'))
-      .required()
-      .options({language: {any: {allowOnly: 'must match password'}}})
-    // type: Joi.string().valid(["teacher", "student", "sponsor", "schoolAdmin", "admin", "globalAdmin"])
-
-  };
-
-  return Joi.validate(user, schema, { allowUnknown: true });
-}
-
-function isValidObjectId(objectId){
-  return mongoose.Types.ObjectId.isValid(objectId)  === true;
-}
+const User = mongoose.model("User", userSchema);
 
 exports.User = User;
-exports.validate = validateUser;
-exports.isValidObjectId = isValidObjectId;

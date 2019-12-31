@@ -1,9 +1,0 @@
-{
-  "jwtPrivateKey": "unsecureKey",
-  "db": "mongodb://localhost/willdone",
-  "port": "4400",
-  "requiresAuth": false,
-  "userPassword": "!pass4sure",
-  "userType": "schoolAdmin",
-  "userName": "Administrator"
-}

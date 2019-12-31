@@ -1,6 +1,6 @@
 const multer = require('multer');
 const sharp = require('sharp');
-const User = require('../db/models/user');
+const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
@@ -14,7 +14,6 @@ const factory = require('./handlerFactory');
 //     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
 //   }
 // });
-
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
