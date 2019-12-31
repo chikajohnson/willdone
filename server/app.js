@@ -1,5 +1,6 @@
 const path = require('path');
 const express = require('express');
+const dotenv = require('dotenv');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -16,6 +17,10 @@ const globalErrorHandler = require('./controllers/errorController');
 
 // Start express app
 const app = express();
+
+dotenv.config({
+  path: '.env'
+});
 
 app.enable('trust proxy');
 
@@ -88,9 +93,9 @@ app.use((req, res, next) => {
 });
 
 // 3) ROUTES AND OTHER STARTUP CONFIGURATIONS
+require("./startup/db")();
 require("./startup/logging")();
 require("./startup/routes")(app);
-require("./startup/db")();
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

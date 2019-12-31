@@ -2,6 +2,8 @@ const validator = require('validator');
 const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const uniqueValidator = require('mongoose-unique-validator');
+
 
 const userSchema = new mongoose.Schema({
   lastName: {
@@ -18,11 +20,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false,
     maxlength: 100
-  },
-  title: {
-    type: String,
-    required: [true, "Title is required"],
-    maxlength: 10
   },
   email: {
     type: String,
@@ -51,6 +48,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Place of birth is required"],
   },
+ dateOfBirth: {
+    type: Date,
+    required: [true, "Date of birth is required"],
+  },
   parish: {
     type: String,
     required: [true, "Enter the name of your parish"],
@@ -66,7 +67,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Password is required"],
     minlength: 8,
-    select: false
+    select: true
   },
   confirmPassword: {
     type: String,
@@ -84,7 +85,7 @@ const userSchema = new mongoose.Schema({
   passwordResetExpires: Date,
   active: {
     type: Boolean,
-    default: false,
+    default: true,
     select: false
   },
   role: {
@@ -94,6 +95,8 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+userSchema.plugin(uniqueValidator);
+
 
 userSchema.pre('save', async function (next) {
   // Only run this function if password was actually modified
@@ -102,8 +105,8 @@ userSchema.pre('save', async function (next) {
   // Hash the password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
 
-  // Delete passwordConfirm field
-  this.passwordConfirm = undefined;
+  // Delete confirmPassword field
+  this.confirmPassword = undefined;
   next();
 });
 
@@ -124,6 +127,8 @@ userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
+  console.log(candidatePassword, userPassword);
+  
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
@@ -149,9 +154,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  // console.log({ resetToken }, this.passwordResetToken);
-
-  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  this.passwordResetExpires = Date.now() + 10 * 60 * 24 * 1000;
 
   return resetToken;
 };
@@ -164,4 +167,4 @@ userSchema.methods.generateActivationCode = function () {
 
 const User = mongoose.model("User", userSchema);
 
-exports.User = User;
+module.exports = User;

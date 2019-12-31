@@ -1,5 +1,4 @@
 const winston = require('winston');
-const dotenv = require('dotenv');
 
 process.on('uncaughtException', err => {
   console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
@@ -8,9 +7,7 @@ process.on('uncaughtException', err => {
   process.exit(1);
 });
 
-dotenv.config({
-  path: './config.env'
-});
+
 const app = require('./app');
 
 const port = process.env.PORT || 3000;
