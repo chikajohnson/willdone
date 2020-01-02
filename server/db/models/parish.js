@@ -39,7 +39,7 @@ const parishSchema = new mongoose.Schema({
             },
             title: {
                 type: String,
-                required:  [title, "title is required"]
+                required:  [true, "title is required"]
             },
             phoneNumber: {
                 type: String,
