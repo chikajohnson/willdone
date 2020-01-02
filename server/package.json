@@ -1,7 +1,7 @@
 {
   "name": "willdone",
   "version": "1.0.0",
-  "description": "heavenly",
+  "description": "app for believers of THE WAY",
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js",
@@ -11,8 +11,8 @@
     "seed": "node seeds/seed.js",
     "test": "jest --watchAll --verbose"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["THE WAY", "parish", "nodejs", "api"],
+  "author": "chikajohnson",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.18.0",
