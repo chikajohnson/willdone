@@ -1,22 +1,39 @@
-const Joi = require('joi');
 const mongoose = require("mongoose");
 
 const parishSocietySchema = new mongoose.Schema({
     society: {
         type: String,
-        required: true
+        required:  [true, "society is required"]
     },
     parish: {
         type: String,
         required: true
     },
-    meeting: {
-        type: Object,
-        required: true
+    type:{ //wheteher parish or station
+        type: String,
+        default: "parish",
+        enum: ["parish", "staion"]
     },
-    disabled: {
+    station: {
+        type: String,
+    },
+    diocese: {
+        type: String,
+        required:  [true, "diocesse is required"]
+    },
+    meeting: [
+        {
+            name: String,
+            start: Number,
+            end: Number,
+            day: String,
+            venue: String,
+            duration: Number
+        }
+    ],
+    active: {
         type: Boolean,
-        default: false
+        default: true
     }
 });
 
@@ -28,30 +45,11 @@ parishSocietySchema.pre('save', async function (next) {
 
 parishSocietySchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ disabled: true });
+    this.find({ active: true });
     next();
 });
 
-const ParishSociety = mongoose.model("parishSociety", parishSocietySchema);
+const ParishSociety = mongoose.model("ParishSociety", parishSocietySchema);
 
-function validateSociety(parishSociety) {
-    const schema = {
-        society: Joi.string()
-            .required(),
-        parish: Joi.string()
-            .required(),
-        meeting: Joi.object()
-            .required(),
-        disabled: Joi.boolean()
-    };
 
-    return Joi.validate(parishSociety, schema, { allowUnknown: true });
-}
-
-function isValidObjectId(objectId) {
-    return mongoose.Types.ObjectId.isValid(objectId) === true;
-}
-
-exports.ParishSociety = ParishSociety;
-exports.validate = validateSociety;
-exports.isValidObjectId = isValidObjectId;
+module.exports = ParishSociety;

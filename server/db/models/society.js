@@ -1,20 +1,17 @@
-const Joi = require('joi');
 const mongoose = require("mongoose");
 
 const societySchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50
+        required: [true, "society name is required"]
     },
     description: {
         type: String,
-        required: true
+        required: [true, "Describe this society"]
     },
-    disabled: {
+    active: {
         type: Boolean,
-        default: false
+        default: true
     }
 });
 
@@ -26,30 +23,10 @@ societySchema.pre('save', async function (next) {
 
 societySchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ disabled: true });
+    this.find({ active: true });
     next();
 });
 
-const Society = mongoose.model("society", societySchema);
+const Society = mongoose.model("Society", societySchema);
 
-function validateSociety(society) {
-    const schema = {
-        name: Joi.string()
-            .min(2)
-            .max(50)
-            .required(),
-        description: Joi.string()
-            .required(),
-        disabled: Joi.boolean()
-    };
-
-    return Joi.validate(society, schema, { allowUnknown: true });
-}
-
-function isValidObjectId(objectId) {
-    return mongoose.Types.ObjectId.isValid(objectId) === true;
-}
-
-exports.Society = Society;
-exports.validate = validateSociety;
-exports.isValidObjectId = isValidObjectId;
+module.exports = Society;

@@ -1,48 +1,77 @@
-const Joi = require('joi');
 const mongoose = require("mongoose");
 
 const programmeSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50
+        required: [true, "programme name is required"]
     },
     isPeriodic: {
         type: Boolean,
         required: true,
         default: false
     },
+    type: {
+        type: String,
+        enum: ["diocese", "parish, society"],
+        default: "parish"
+    },
     start: {
         type: Date,
-        required: true
+        required: [true, "start time is required"]
     },
 
     end: {
         type: Date,
-        required: true
+        required: [true, "specify when the programme ends"]
+    },
+    attendance: {
+        men: {
+            type: Number,
+            default: 0
+        },
+        women: {
+            type: Number,
+            default: 0
+        },
+        boys: {
+            type: Number,
+            default: 0
+        },
+        girls: {
+            type: Number,
+            default: 0
+        },
+        children: {
+            type: Number,
+            default: 0
+        },
+        total: {
+            type: Number,
+            default: 0
+        }
     },
     language: {
         type: String,
-        required: true,
         default: "English"
     },
     officiatedBy: {
         type: String,
-        required: true
+        required: false
     },
     parish: {
         type: String,
-        required: true
+        required: [true, "parish is required"]
     },
+   society:{
+    type: String
+   },
     description: {
         type: String,
-        required: true,
-        minlength: 10,
+        required: [true, "briefly describe this programme"],
     },
-    disabled: {
+    active: {
         type: Boolean,
-        default: false
+        default: true
     }
 });
 
@@ -54,42 +83,10 @@ programmeSchema.pre('save', async function (next) {
 
 programmeSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ disabled: true });
+    this.find({ active: true });
     next();
 });
 
-const Programme = mongoose.model("programme", programmeSchema);
+const Programme = mongoose.model("Programme", programmeSchema);
 
-function validateProgramme(programme) {
-    const schema = {
-        name: Joi.string()
-            .min(2)
-            .max(50)
-            .required(),
-        isPeriodic: Joi.bool(),
-        start: Joi.date()
-            .required(),
-        end: Joi.date()
-            .required(),
-        language: Joi.string(),
-        officiatedBy: Joi.string()
-            .required(),
-        parish: Joi.string()
-            .required(),
-        description: Joi.string()
-            .min(10)
-            .required(),
-        disabled: Joi.boolean(),
-        diocese: Joi.string().required()
-    };
-
-    return Joi.validate(programme, schema, { allowUnknown: true });
-}
-
-function isValidObjectId(objectId) {
-    return mongoose.Types.ObjectId.isValid(objectId) === true;
-}
-
-exports.Programme = Programme;
-exports.validate = validateProgramme;
-exports.isValidObjectId = isValidObjectId;
+module.exports = Programme;

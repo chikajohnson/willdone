@@ -1,55 +1,25 @@
-const Joi = require('joi');
 const randomString = require('randomstring');
 const mongoose = require("mongoose");
 
 const stationSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50
+        required: [true, "station name is required"]
     },
     code: {
-        type: String,
-        minlength: 3,
-        maxlength: 50
+        type: String
     },
     parish: {
-        type: String,
-        minlength: 3,
-        maxlength: 50
+        type: String
     },
     emails: [String],
     phoneNumbers: [String],
     address: {
         type: String,
-        required: true
-    },
-    postalAddress: {
-        type: String,
-        required: false
-    },
-    website: {
-        type: String,
-        required: false
+        required: [true, "station address is required"]
     },
     logo: {
         type: String,
-        required: false
-    },
-    pictures: [String],
-    slogan: {
-        type: String,
-        required: false,
-        minlength: 2,
-        maxlength: 100
-    },
-    orderInCharge: {
-        type: String,
-        required: false
-    },
-    accountNo: {
-        type: Number,
         required: false
     },
     feastDay: {
@@ -60,45 +30,26 @@ const stationSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    stationDay: {
-        type: String,
-        required: false
-    },
-    missionStatement: {
-        type: String,
-        required: false
-    },
     latitude: {
         type: Number,
-        required: true
+        required: false
     },
     longititude: {
         type: Number,
-        required: true
+        required: false
     },
     town: {
         type: String,
         required: false
-    },
-    state: {
-        type: String
-    },
-    denary: {
-        type: String,
-        required: true
-    },
-    diocese: {
-        type: String,
-        required: true
     },
     description: {
         type: String,
         required: true,
         minlength: 10,
     },
-    disabled: {
+    active: {
         type: Boolean,
-        default: false
+        default: true
     }
 });
 
@@ -117,48 +68,10 @@ stationSchema.pre('save', function (next) {
 
 stationSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ disabled: true });
+    this.find({ active: true });
     next();
 });
 
-const Station = mongoose.model("station", stationSchema);
+const Station = mongoose.model("Station", stationSchema);
 
-function validateStation(station) {
-    const schema = {
-        name: Joi.string().required().min(3),
-        code: Joi.string().min(3),
-        parish: Joi.string().min(3).max(50),
-        emails: Joi.array().required(),
-        phoneNumbers: Joi.array().required(),
-        address: Joi.string().required(),
-        postalAddress: Joi.string(),
-        website: Joi.string(),
-        logo: Joi.string(),
-        pictures: Joi.array().required(),
-        slogan:  Joi.string(),
-        orderInCharge: Joi.string(),
-        accountNo: Joi.number(),
-        feastDay:Joi.string(),
-        patronSaint: Joi.string(),
-        stationDay: Joi.string(),
-        missionStatement: Joi.string(),
-        latitude: Joi.number(),
-        longititude: Joi.number(),
-        town: Joi.string(),
-        state: Joi.string().required(),
-        denary: Joi.string().required(),
-        diocese: Joi.string().required(),
-        description: Joi.string().required().min(10),
-        disabled: Joi.bool().required().default(false)
-    };
-
-    return Joi.validate(station, schema, { allowUnknown: true });
-}
-
-function isValidObjectId(objectId) {
-    return mongoose.Types.ObjectId.isValid(objectId) === true;
-}
-
-exports.Station = Station;
-exports.validate = validateStation;
-exports.isValidObjectId = isValidObjectId;
+module.exports = Station;

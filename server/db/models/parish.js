@@ -1,24 +1,22 @@
-const Joi = require('joi');
 const randomString = require('randomstring');
 const mongoose = require("mongoose");
 
 const parishSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true,
-        minlength: 2,
-        maxlength: 50
+        required: [true, "Parish name is required"],
+        unique: true
     },
     code: {
         type: String,
         minlength: 3,
         maxlength: 50
     },
-    emails: [String],
-    phoneNumbers: [String],
+    emails: [{ type: String, require: [true, "email is required"] }],
+    phoneNumbers: [{ type: String, require: [true, "phonenumber is required"] }],
     address: {
         type: String,
-        required: true
+        required: [true, "Address is required"]
     },
     postalAddress: {
         type: String,
@@ -26,20 +24,39 @@ const parishSchema = new mongoose.Schema({
     },
     website: {
         type: String,
-        required: false
+        required: false,
+        unique: true
     },
     logo: {
         type: String,
         required: false
     },
+    pastoralTeam: [
+        {
+            name: {
+                type: String,
+                required: [true, "name is required"]
+            },
+            title: {
+                type: String,
+                required:  [title, "title is required"]
+            },
+            phoneNumber: {
+                type: String,
+                required:  [true, "title is required"]
+            },
+            email: {
+                type: String,
+                required:  [true, "email is required"],
+            },
+            disabled: {
+                type: Boolean,
+                default: false
+            }
+        }
+    ],
     pictures: [String],
     slogan: {
-        type: String,
-        required: false,
-        minlength: 2,
-        maxlength: 100
-    },
-    orderInCharge: {
         type: String,
         required: false
     },
@@ -65,11 +82,11 @@ const parishSchema = new mongoose.Schema({
     },
     latitude: {
         type: Number,
-        required: true
+        required: false
     },
     longititude: {
         type: Number,
-        required: true
+        required: false
     },
     town: {
         type: String,
@@ -88,12 +105,11 @@ const parishSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required: true,
-        minlength: 10,
+        required:  [true, "Give a brief description of this parish"]
     },
-    disabled: {
+    active: {
         type: Boolean,
-        default: false
+        default: true
     }
 });
 
@@ -112,47 +128,10 @@ parishSchema.pre('save', function (next) {
 
 parishSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ disabled: true });
+    this.find({ active: true });
     next();
 });
 
-const Parish = mongoose.model("parish", parishSchema);
+const Parish = mongoose.model("Parish", parishSchema);
 
-function validateParish(parish) {
-    const schema = {
-        name: Joi.string().required().min(3),
-        code: Joi.string().min(3),
-        emails: Joi.array().required(),
-        phoneNumbers: Joi.array().required(),
-        address: Joi.string().required(),
-        postalAddress: Joi.string(),
-        website: Joi.string(),
-        logo: Joi.string(),
-        pictures: Joi.array().required(),
-        slogan:  Joi.string(),
-        orderInCharge: Joi.string(),
-        accountNo: Joi.number(),
-        feastDay:Joi.string(),
-        patronSaint: Joi.string(),
-        parishDay: Joi.string(),
-        missionStatement: Joi.string(),
-        latitude: Joi.number(),
-        longititude: Joi.number(),
-        town: Joi.string(),
-        state: Joi.string().required(),
-        denary: Joi.string().required(),
-        diocese: Joi.string().required(),
-        description: Joi.string().required().min(10),
-        disabled: Joi.bool().required().default(false)
-    };
-
-    return Joi.validate(parish, schema, { allowUnknown: true });
-}
-
-function isValidObjectId(objectId) {
-    return mongoose.Types.ObjectId.isValid(objectId) === true;
-}
-
-exports.Parish = Parish;
-exports.validate = validateParish;
-exports.isValidObjectId = isValidObjectId;
+module.exports = Parish;

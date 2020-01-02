@@ -1,5 +1,5 @@
 const express = require('express');
-const dioceseController = require('../controllers/dioceseController');
+const societyController = require('../controllers/societyController');
 const authController = require('../controllers/authController');
 
 const router = express.Router();
@@ -11,13 +11,13 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(dioceseController.getAllDiocese)
-  .post(dioceseController.createDiocese);
+  .get(societyController.getAllSociety)
+  .post(societyController.createSociety);
 
 router
   .route('/:id')
-  .get(dioceseController.getDiocese)
-  .patch(dioceseController.updateDiocese)
-  .delete(dioceseController.deleteDiocese);
+  .get(societyController.getSociety)
+  .patch(societyController.updateSociety)
+  .delete(societyController.deleteSociety);
 
 module.exports = router;
