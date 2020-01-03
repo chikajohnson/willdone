@@ -93,6 +93,13 @@ const userSchema = new mongoose.Schema({
     enum: ["clergy", "lay", "user", "admin", "globalAdmin"],
     default: "lay"
   },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+  }
 },
   {
     toJSON: { virtuals: true },
