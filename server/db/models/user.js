@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Place of birth is required"],
   },
- dateOfBirth: {
+  dateOfBirth: {
     type: Date,
     required: [true, "Date of birth is required"],
   },
@@ -92,8 +92,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["clergy", "lay", "user", "admin", "globalAdmin"],
     default: "lay"
-  }
-});
+  },
+},
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+  });
 
 userSchema.plugin(uniqueValidator);
 
@@ -128,7 +132,7 @@ userSchema.methods.correctPassword = async function (
   userPassword
 ) {
   console.log(candidatePassword, userPassword);
-  
+
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 

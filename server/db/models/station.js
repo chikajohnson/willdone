@@ -51,7 +51,11 @@ const stationSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     }
-});
+},
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    });
 
 
 stationSchema.pre('save', async function (next) {

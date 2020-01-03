@@ -35,6 +35,14 @@ const parishSocietySchema = new mongoose.Schema({
         type: Boolean,
         default: true
     }
+},
+{
+  toJSON: {virtuals : true},
+  toObject: {virtuals : true}
+},
+{
+  toJSON: {virtuals : true},
+  toObject: {virtuals : true}
 });
 
 

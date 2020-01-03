@@ -111,6 +111,10 @@ const parishSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     }
+},
+{
+  toJSON: {virtuals : true},
+  toObject: {virtuals : true}
 });
 
 
