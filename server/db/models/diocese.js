@@ -1,5 +1,6 @@
 const randomString = require('randomstring');
 const mongoose = require("mongoose");
+const modelObj  = require('./allModels');
 
 const dioceseSchema = new mongoose.Schema({
     name: {
@@ -76,7 +77,7 @@ dioceseSchema.pre(/^find/, function (next) {
     next();
 });
 
-const Diocese = mongoose.model("Diocese", dioceseSchema);
+const Diocese = mongoose.model(modelObj.diocese, dioceseSchema);
 
 
 

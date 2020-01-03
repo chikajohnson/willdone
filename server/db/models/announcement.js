@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const modelObj  = require('./allModels');
 
 const announcementSchema = new mongoose.Schema({
     title: {
@@ -11,11 +12,11 @@ const announcementSchema = new mongoose.Schema({
     },
     sourceType: {
         type: String,
-        enum: ["diocese", "parish, society"],
+        enum: ["diocese", "parish, station, society"],
         default: "parish"
     },
     source: {
-        type: String
+        type: Object
     },
     start: {
         type: Date
@@ -28,10 +29,10 @@ const announcementSchema = new mongoose.Schema({
         type: String
     },
     parish: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.parish,
         required: [true, "parish is required"]
     },
-
     active: {
         type: Boolean,
         default: true
@@ -61,6 +62,6 @@ announcementSchema.pre(/^find/, function (next) {
     next();
 });
 
-const Announcement = mongoose.model("Announcement", announcementSchema);
+const Announcement = mongoose.model(modelObj.announcement, announcementSchema);
 
 module.exports = Announcement;

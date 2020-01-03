@@ -1,4 +1,5 @@
 const validator = require('validator');
+const modelObj  = require('./allModels');
 const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
@@ -176,6 +177,6 @@ userSchema.methods.generateActivationCode = function () {
   return code;
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model(modelObj.user, userSchema);
 
 module.exports = User;

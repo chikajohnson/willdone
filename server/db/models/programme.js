@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const modelObj = require('./allModels');
 
 const programmeSchema = new mongoose.Schema({
     name: {
@@ -59,12 +60,14 @@ const programmeSchema = new mongoose.Schema({
         required: false
     },
     parish: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.parish,
         required: [true, "parish is required"]
     },
-   society:{
-    type: String
-   },
+    society: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.society,
+    },
     description: {
         type: String,
         required: [true, "briefly describe this programme"],
@@ -74,17 +77,17 @@ const programmeSchema = new mongoose.Schema({
         default: true
     },
     createdAt: {
-      type: Date,
-      default: Date.now
+        type: Date,
+        default: Date.now
     },
     updatedAt: {
-      type: Date,
+        type: Date,
     }
 },
-{
-  toJSON: {virtuals : true},
-  toObject: {virtuals : true}
-});
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    });
 
 
 programmeSchema.pre('save', async function (next) {
@@ -98,6 +101,6 @@ programmeSchema.pre(/^find/, function (next) {
     next();
 });
 
-const Programme = mongoose.model("Programme", programmeSchema);
+const Programme = mongoose.model(modelObj.programme, programmeSchema);
 
 module.exports = Programme;

@@ -1,4 +1,5 @@
 const randomString = require('randomstring');
+const modelObj  = require('./allModels');
 const mongoose = require("mongoose");
 
 const stationSchema = new mongoose.Schema({
@@ -10,7 +11,9 @@ const stationSchema = new mongoose.Schema({
         type: String
     },
     parish: {
-        type: String
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.parish,
+        required: [true, "parish is required"],
     },
     emails: [String],
     phoneNumbers: [String],
@@ -83,6 +86,6 @@ stationSchema.pre(/^find/, function (next) {
     next();
 });
 
-const Station = mongoose.model("Station", stationSchema);
+const Station = mongoose.model(modelObj.station, stationSchema);
 
 module.exports = Station;

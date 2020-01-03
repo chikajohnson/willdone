@@ -1,25 +1,30 @@
 const mongoose = require("mongoose");
+const modelObj  = require('./allModels');
 
 const parishSocietySchema = new mongoose.Schema({
     society: {
-        type: String,
-        required:  [true, "society is required"]
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.society,
+        required: [true, "society is required"]
     },
     parish: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.parish,
+        required: [true, "parish is required"]
     },
-    type:{ //wheteher parish or station
+    type:{ //whether parish or station
         type: String,
         default: "parish",
-        enum: ["parish", "staion"]
+        enum: ["parish", "station"]
     },
     station: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.station
     },
     diocese: {
-        type: String,
-        required:  [true, "diocesse is required"]
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.diocese,
+        required: [true, "diocese is required"]
     },
     meeting: [
         {
@@ -64,7 +69,7 @@ parishSocietySchema.pre(/^find/, function (next) {
     next();
 });
 
-const ParishSociety = mongoose.model("ParishSociety", parishSocietySchema);
+const ParishSociety = mongoose.model(modelObj.parishSociety, parishSocietySchema);
 
 
 module.exports = ParishSociety;

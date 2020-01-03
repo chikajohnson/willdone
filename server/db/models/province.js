@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const modelObj  = require('./allModels');
 
-const societySchema = new mongoose.Schema({
+const provinceSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, "society name is required"]
+        required: [true, "province name is required"]
     },
     description: {
         type: String,
-        required: [true, "Describe this society"]
+        required: [true, "Describe this province"]
     },
     active: {
         type: Boolean,
@@ -28,17 +28,17 @@ const societySchema = new mongoose.Schema({
 });
 
 
-societySchema.pre('save', async function (next) {
+provinceSchema.pre('save', async function (next) {
     console.log("before save");
     next();
 });
 
-societySchema.pre(/^find/, function (next) {
+provinceSchema.pre(/^find/, function (next) {
     // this points to the current query
     this.find({ active: true });
     next();
 });
 
-const Society = mongoose.model(modelObj.society, societySchema);
+const Province = mongoose.model(modelObj.province, provinceSchema);
 
-module.exports = Society;
+module.exports = Province;

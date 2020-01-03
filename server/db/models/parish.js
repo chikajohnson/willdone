@@ -1,5 +1,6 @@
 const randomString = require('randomstring');
 const mongoose = require("mongoose");
+const modelObj  = require('./allModels');
 
 const parishSchema = new mongoose.Schema({
     name: {
@@ -100,8 +101,9 @@ const parishSchema = new mongoose.Schema({
         required: true
     },
     diocese: {
-        type: String,
-        required: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.diocese,
+        required: [true, "diocese is required"]
     },
     description: {
         type: String,
@@ -143,6 +145,6 @@ parishSchema.pre(/^find/, function (next) {
     next();
 });
 
-const Parish = mongoose.model("Parish", parishSchema);
+const Parish = mongoose.model(modelObj.parish, parishSchema);
 
 module.exports = Parish;
