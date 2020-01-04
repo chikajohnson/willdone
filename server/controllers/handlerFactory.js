@@ -21,7 +21,8 @@ exports.updateOne = Model =>
     req.body.updatedAt = Date.now();
     const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
-      runValidators: true
+      runValidators: true,
+      context: 'query'
     });
 
     if (!doc) {
