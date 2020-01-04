@@ -54,6 +54,10 @@ const stationSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.user,
+      },
     createdAt: {
       type: Date,
       default: Date.now

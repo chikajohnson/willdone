@@ -71,7 +71,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   }
 
   // 2) Filtered out unwanted fields names that are not allowed to be updated
-  const filteredBody = filterObj(req.body, 'gender', 'firstName', "lastName", "placeOfBirth", "dateOfBirth", "parish");
+  const filteredBody = filterObj(req.body, 'gender', 'firstName', "lastName", "placeOfBirth", "dateOfBirth", "parish", "role");
   if (req.file) filteredBody.photo = req.file.filename;
 
   console.log("updatedUser before", filteredBody);

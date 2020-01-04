@@ -43,6 +43,10 @@ const dioceseSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.user,
+      },
     createdAt: {
       type: Date,
       default: Date.now
@@ -71,8 +75,7 @@ dioceseSchema.pre('save', function (next) {
 
 
 dioceseSchema.pre(/^find/, function (next) {
-    // this points to the current query
-    console.log(this);
+    
     //this.find({ active: true });
     next();
 });

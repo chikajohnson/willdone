@@ -68,7 +68,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Password is required"],
     minlength: 8,
-    select: true
+    select: false
   },
   confirmPassword: {
     type: String,
@@ -93,6 +93,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["clergy", "lay", "user", "admin", "globalAdmin"],
     default: "lay"
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: modelObj.user,
   },
   createdAt: {
     type: Date,

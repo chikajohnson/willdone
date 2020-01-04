@@ -1,6 +1,7 @@
 const randomString = require('randomstring');
 const mongoose = require("mongoose");
-const modelObj  = require('./allModels');
+const validator = require('validator');
+const modelObj = require('./allModels');
 
 const parishSchema = new mongoose.Schema({
     name: {
@@ -26,7 +27,8 @@ const parishSchema = new mongoose.Schema({
     website: {
         type: String,
         required: false,
-        unique: true
+        unique: true,
+        validate: [validator.isURL, 'Please provide a website address']
     },
     logo: {
         type: String,
@@ -40,15 +42,15 @@ const parishSchema = new mongoose.Schema({
             },
             title: {
                 type: String,
-                required:  [true, "title is required"]
+                required: [true, "title is required"]
             },
             phoneNumber: {
                 type: String,
-                required:  [true, "title is required"]
+                required: [true, "title is required"]
             },
             email: {
                 type: String,
-                required:  [true, "email is required"],
+                required: [true, "email is required"],
             },
             disabled: {
                 type: Boolean,
@@ -61,10 +63,10 @@ const parishSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    accountNo: {
-        type: Number,
-        required: false
-    },
+    bankAccount: [{
+        bank: String,
+        accountNo: String
+    }],
     feastDay: {
         type: String,
         required: false
@@ -85,7 +87,7 @@ const parishSchema = new mongoose.Schema({
         type: Number,
         required: false
     },
-    longititude: {
+    longitude: {
         type: Number,
         required: false
     },
@@ -107,24 +109,28 @@ const parishSchema = new mongoose.Schema({
     },
     description: {
         type: String,
-        required:  [true, "Give a brief description of this parish"]
+        required: [true, "Give a brief description of this parish"]
     },
     active: {
         type: Boolean,
         default: true
     },
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: modelObj.user,
+    },
     createdAt: {
-      type: Date,
-      default: Date.now
+        type: Date,
+        default: Date.now
     },
     updatedAt: {
-      type: Date,
+        type: Date,
     }
 },
-{
-  toJSON: {virtuals : true},
-  toObject: {virtuals : true}
-});
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    });
 
 
 parishSchema.pre('save', async function (next) {
@@ -134,13 +140,22 @@ parishSchema.pre('save', async function (next) {
 
 parishSchema.pre('save', function (next) {
     if (this.name && this.isNew) {
-        this.code = this.name.substring(0, 3).toUpperCase() + "-" + randomString.generate({ length: 6, charset: 'alphabetic' }).toUpperCase();
+        this.code = this.name.substring(0,7).toUpperCase() + "-" + randomString.generate({ length: 6, charset: 'alphabetic' }).toUpperCase();
     }
     next();
 });
 
 parishSchema.pre(/^find/, function (next) {
     // this points to the current query
+    this.populate({
+        path: 'diocese',
+        select: 'name province'
+    });
+
+    this.populate({
+        path: 'createdBy',
+        select: 'email id'
+    });
     this.find({ active: true });
     next();
 });
