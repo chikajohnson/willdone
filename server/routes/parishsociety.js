@@ -1,5 +1,5 @@
 const express = require('express');
-const parishController = require('../controllers/parishController');
+const parishSocietyController = require('../controllers/parishSocietyController');
 const authController = require('../controllers/authController');
 
 const router = express.Router();
@@ -11,13 +11,13 @@ const router = express.Router();
 
 router
   .route('/')
-  .get(parishController.getAllParish)
-  .post(parishController.createParish);
+  .get(parishSocietyController.getAllParishSocieties)
+  .post(parishSocietyController.createParishSociety);
 
 router
   .route('/:id')
-  .get(parishController.getParish)
-  .patch(parishController.updateParish)
-  .delete(parishController.deleteParish);
+  .get(parishSocietyController.getParishSociety)
+  .patch(parishSocietyController.getParishSociety)
+  .delete(parishSocietyController.deleteParishSociety);
 
 module.exports = router;

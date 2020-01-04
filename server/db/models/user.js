@@ -84,16 +84,20 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  role: {
+    type: String,
+    enum: ["clergy", "lay", "user", "admin", "globalAdmin", "developer"],
+    default: "lay"
+  },
   active: {
     type: Boolean,
     default: true,
     select: false
   },
-  role: {
-    type: String,
-    enum: ["clergy", "lay", "user", "admin", "globalAdmin"],
-    default: "lay"
-  },
+  isSystemDefined: {
+    type: Boolean,
+    default: false
+},
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: modelObj.user,

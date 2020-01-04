@@ -1,10 +1,17 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require('mongoose-unique-validator');
 const modelObj  = require('./allModels');
 
 const societySchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, "society name is required"]
+        required: [true, "society name is required"],
+        unique : true,
+    },
+    shortName: {
+        type: String,
+        unique: [true, "Another society is using that short name"],
+        maxlength: 10
     },
     description: {
         type: String,
@@ -13,6 +20,10 @@ const societySchema = new mongoose.Schema({
     active: {
         type: Boolean,
         default: true
+    },
+    isSystemDefined: {
+        type: Boolean,
+        default: false
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +42,7 @@ const societySchema = new mongoose.Schema({
     toObject: { virtuals: true }
 });
 
+societySchema.plugin(uniqueValidator);
 
 societySchema.pre('save', async function (next) {
     console.log("before save");

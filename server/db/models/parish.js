@@ -115,6 +115,10 @@ const parishSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    isSystemDefined: {
+        type: Boolean,
+        default: false
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: modelObj.user,
