@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const modelObj  = require('./allModels');
+const modelObj = require('./allModels');
 
 const parishSocietySchema = new mongoose.Schema({
     society: {
@@ -12,10 +12,10 @@ const parishSocietySchema = new mongoose.Schema({
         ref: modelObj.parish,
         required: [true, "parish is required"]
     },
-    type:{ //whether parish or station
+    type: { //whether parish or station
         type: String,
         default: "parish",
-        enum: ["parish", "station"]
+        enum: { values: ["parish", "station"], message: "society type can either be 'parish' or 'station'" }
     },
     station: {
         type: mongoose.Schema.Types.ObjectId,
@@ -24,16 +24,22 @@ const parishSocietySchema = new mongoose.Schema({
     diocese: {
         type: mongoose.Schema.Types.ObjectId,
         ref: modelObj.diocese,
-        required: [true, "diocese is required"]
+        required: [true, "diocese is required"],
+        select : false
     },
     meeting: [
         {
             name: String,
-            start: Number,
-            end: Number,
+            start: String,
+            end: String,
             day: String,
             venue: String,
-            duration: Number
+            duration: Number,
+            information: {
+                type: String,
+                maxLength: 50
+            },
+
         }
     ],
     active: {
@@ -47,23 +53,23 @@ const parishSocietySchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: modelObj.user,
-      },
+    },
     createdAt: {
-      type: Date,
-      default: Date.now
+        type: Date,
+        default: Date.now
     },
     updatedAt: {
-      type: Date,
+        type: Date,
     }
 },
-{
-  toJSON: {virtuals : true},
-  toObject: {virtuals : true}
-},
-{
-  toJSON: {virtuals : true},
-  toObject: {virtuals : true}
-});
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    },
+    {
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    });
 
 
 parishSocietySchema.pre('save', async function (next) {
@@ -74,6 +80,16 @@ parishSocietySchema.pre('save', async function (next) {
 parishSocietySchema.pre(/^find/, function (next) {
     // this points to the current query
     this.find({ active: true });
+    this.populate({
+        path: 'society',
+        select: 'name shortName'
+    });
+
+    this.populate({
+        path: 'parish',
+        select: 'name address',
+
+    });
     next();
 });
 

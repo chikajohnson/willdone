@@ -17,7 +17,7 @@ router
 router
   .route('/:id')
   .get(parishSocietyController.getParishSociety)
-  .patch(parishSocietyController.getParishSociety)
+  .patch(parishSocietyController.updateParishSociety)
   .delete(parishSocietyController.deleteParishSociety);
 
 module.exports = router;
