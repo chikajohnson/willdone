@@ -4,7 +4,7 @@ const modelObj = require('./allModels');
 const programmeSchema = new mongoose.Schema({
     name: {
         type: String,
-        required: [true, "programme name is required"]
+        required: [true, "programme name is required"],
     },
     isPeriodic: {
         type: Boolean,
@@ -13,16 +13,16 @@ const programmeSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ["diocese", "parish, society"],
+        enum: ["diocese", "parish","society"],
         default: "parish"
     },
     start: {
-        type: Date,
+        type: String,
         required: [true, "start time is required"]
     },
 
     end: {
-        type: Date,
+        type: String,
         required: [true, "specify when the programme ends"]
     },
     attendance: {
@@ -105,6 +105,15 @@ programmeSchema.pre('save', async function (next) {
 
 programmeSchema.pre(/^find/, function (next) {
     // this points to the current query
+    this.populate({
+        path: 'parish',
+        select: 'name'
+    });
+    this.populate({
+        path: 'createdBy',
+        select: 'email id'
+    });
+
     this.find({ active: true });
     next();
 });

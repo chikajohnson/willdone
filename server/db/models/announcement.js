@@ -12,7 +12,7 @@ const announcementSchema = new mongoose.Schema({
     },
     sourceType: {
         type: String,
-        enum: ["diocese", "parish, station, society"],
+        enum: ["diocese", "parish", "station", "society"],
         default: "parish"
     },
     source: {
@@ -26,8 +26,9 @@ const announcementSchema = new mongoose.Schema({
         type: Date
     },
     media: {
-        type: String
+        type: String 
     },
+    venue: String,
     parish: {
         type: mongoose.Schema.Types.ObjectId,
         ref: modelObj.parish,
@@ -66,7 +67,17 @@ announcementSchema.pre('save', async function (next) {
 
 announcementSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ disabled: true });
+    this.populate({
+        path: 'diocese',
+        select: 'name province'
+    });
+
+    this.populate({
+        path: 'createdBy',
+        select: 'email id'
+    });
+
+    this.find({ active: true });
     next();
 });
 
