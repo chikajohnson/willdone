@@ -105,15 +105,6 @@ programmeSchema.pre('save', async function (next) {
 
 programmeSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.populate({
-        path: 'parish',
-        select: 'name'
-    });
-    this.populate({
-        path: 'createdBy',
-        select: 'email id'
-    });
-
     next();
 });
 

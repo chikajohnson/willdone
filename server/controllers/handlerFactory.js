@@ -61,12 +61,12 @@ exports.getOne = (Model, popOptions) =>
     });
   });
 
-exports.getAll = Model =>
+exports.getAll = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
 
     let filter = {active: true};
 
-    const features = new APIFeatures(Model.find(filter), req.query)
+    const features = new APIFeatures(Model.find(filter).populate(popOptions), req.query)
       .filter()
       .sort()
       .limitFields()

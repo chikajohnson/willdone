@@ -78,17 +78,6 @@ parishSocietySchema.pre('save', async function (next) {
 });
 
 parishSocietySchema.pre(/^find/, function (next) {
-    // this points to the current query
-    this.populate({
-        path: 'society',
-        select: 'name shortName'
-    });
-
-    this.populate({
-        path: 'parish',
-        select: 'name address',
-
-    });
     next();
 });
 

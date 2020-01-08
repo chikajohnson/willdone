@@ -83,7 +83,7 @@ stationSchema.pre('save', async function (next) {
 
 stationSchema.pre('save', function (next) {
     if (this.name && this.isNew) {
-        this.code = this.name.substring(0, 3).toUpperCase() + "-" + randomString.generate({ length: 6, charset: 'alphabetic' }).toUpperCase();
+        this.code = this.name.substring(0, 7).toUpperCase() + "-" + randomString.generate({ length: 6, charset: 'alphabetic' }).toUpperCase();
     }
     next();
 });

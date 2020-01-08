@@ -67,16 +67,6 @@ announcementSchema.pre('save', async function (next) {
 
 announcementSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.populate({
-        path: 'diocese',
-        select: 'name province'
-    });
-
-    this.populate({
-        path: 'createdBy',
-        select: 'email id'
-    });
-
     next();
 });
 
