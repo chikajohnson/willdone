@@ -160,7 +160,6 @@ parishSchema.pre(/^find/, function (next) {
         path: 'createdBy',
         select: 'email id'
     });
-    this.find({ active: true });
     next();
 });
 

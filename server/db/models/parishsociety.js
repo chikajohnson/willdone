@@ -79,7 +79,6 @@ parishSocietySchema.pre('save', async function (next) {
 
 parishSocietySchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ active: true });
     this.populate({
         path: 'society',
         select: 'name shortName'

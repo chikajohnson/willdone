@@ -114,7 +114,6 @@ programmeSchema.pre(/^find/, function (next) {
         select: 'email id'
     });
 
-    this.find({ active: true });
     next();
 });
 

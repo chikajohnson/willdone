@@ -90,7 +90,6 @@ stationSchema.pre('save', function (next) {
 
 stationSchema.pre(/^find/, function (next) {
     // this points to the current query
-    this.find({ active: true });
     next();
 });
 

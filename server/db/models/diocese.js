@@ -80,7 +80,6 @@ dioceseSchema.pre('save', function (next) {
 
 dioceseSchema.pre(/^find/, function (next) {
     
-    //this.find({ active: true });
     next();
 });
 
