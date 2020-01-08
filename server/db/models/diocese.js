@@ -6,7 +6,6 @@ const dioceseSchema = new mongoose.Schema({
     name: {
         type: String,
         required: [true, "name is required"],
-        minlength: 2,
         maxlength: 50,
         unique: true
     },

@@ -1,5 +1,5 @@
 const randomString = require('randomstring');
-const modelObj  = require('./allModels');
+const modelObj = require('./allModels');
 const mongoose = require("mongoose");
 
 const stationSchema = new mongoose.Schema({
@@ -61,13 +61,13 @@ const stationSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: modelObj.user,
-      },
+    },
     createdAt: {
-      type: Date,
-      default: Date.now
+        type: Date,
+        default: Date.now
     },
     updatedAt: {
-      type: Date,
+        type: Date,
     }
 },
     {
@@ -75,6 +75,7 @@ const stationSchema = new mongoose.Schema({
         toObject: { virtuals: true }
     });
 
+stationSchema.index({ 'name': 1, 'parish': 1 }, { unique: true, message: "A similar station has been created for this parish" });
 
 stationSchema.pre('save', async function (next) {
     console.log("before save");

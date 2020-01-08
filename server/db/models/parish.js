@@ -136,6 +136,7 @@ const parishSchema = new mongoose.Schema({
         toObject: { virtuals: true }
     });
 
+parishSchema.index({'name': 1, 'diocese': 1}, {unique : true});
 
 parishSchema.pre('save', async function (next) {
     console.log("before save");
@@ -144,7 +145,7 @@ parishSchema.pre('save', async function (next) {
 
 parishSchema.pre('save', function (next) {
     if (this.name && this.isNew) {
-        this.code = this.name.substring(0,7).toUpperCase() + "-" + randomString.generate({ length: 6, charset: 'alphabetic' }).toUpperCase();
+        this.code = this.name.substring(0, 7).toUpperCase() + "-" + randomString.generate({ length: 6, charset: 'alphabetic' }).toUpperCase();
     }
     next();
 });

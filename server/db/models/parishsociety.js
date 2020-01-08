@@ -71,6 +71,7 @@ const parishSocietySchema = new mongoose.Schema({
         toObject: { virtuals: true }
     });
 
+parishSocietySchema.index({'society': 1, 'parish': 11}, {unique : true},{ message : "A similar society has been created for this parish"});
 
 parishSocietySchema.pre('save', async function (next) {
     console.log("before save");
