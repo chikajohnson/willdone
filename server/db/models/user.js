@@ -84,6 +84,9 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  activated : {type: Boolean, default: false},
+  activationToken : String,
+  activationExpires : Date,
   role: {
     type: String,
     enum: ["clergy", "lay", "user", "admin", "globalAdmin", "developer"],
@@ -176,6 +179,19 @@ userSchema.methods.createPasswordResetToken = function () {
   this.passwordResetExpires = Date.now() + 10 * 60 * 24 * 1000;
 
   return resetToken;
+};
+
+userSchema.methods.createActivationToken = function () {
+  const token = crypto.randomBytes(32).toString('hex');
+
+  this.activationToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  this.activationExpires = Date.now() + 10 * 60 * 24 * 1000;
+
+  return token;
 };
 
 userSchema.methods.generateActivationCode = function () {

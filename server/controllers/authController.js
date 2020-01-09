@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../db/models/user');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const Email = require('../utils/email');
+const { sendActivationToken } = require('../utils/email');
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -39,11 +39,26 @@ const createSendToken = (user, statusCode, req, res) => {
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);
 
-  const url = `${req.protocol}://${req.get('host')}/me`;
+   //Generate the random activation token
+   const activationToken = newUser.createActivationToken();
+   await newUser.save({ validateBeforeSave: false });
+  try {
+    const activationURL = `${req.protocol}://${req.get(
+      'host'
+    )}/api/v1/auth/activate/${activationToken}`;
+    await sendActivationToken(newUser.email, newUser.firstName, activationURL);
 
-  //await new Email(newUser, url).sendWelcome();
+    createSendToken(newUser, 201, req, res);
+  } catch (err) {
+    newUser.activateAccount = undefined;
+    newUser.activationExpires = undefined;
+    await newUser.save({ validateBeforeSave: false });
 
-  createSendToken(newUser, 201, req, res);
+    return next(
+      new AppError('There was an error sending the email. Try again later!'),
+      500
+    );
+  }
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -230,6 +245,39 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 3) Update changedPasswordAt property for the user
   // 4) Log the user in, send JWT
   createSendToken(user, 200, req, res);
+});
+
+
+exports.activateAccount = catchAsync(async (req, res, next) => {
+  // 1) Get user based on the token
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    activationToken: hashedToken,
+    activationExpires: { $gt: Date.now() }
+  });
+
+  console.log("USER", user);
+  
+
+  // 2) If token has not expired, and there is user, activate account
+  if (!user) {
+    return next(new AppError('Token is invalid or has expired', 400));
+  }
+  user.activated = true;
+  user.activationToken = undefined;
+  user.activationExpires = undefined;
+  await user.save({ validateBeforeSave: false });
+
+
+  // 3) send 200 response
+  res.status(200).json({
+    status: 'success',
+    message: 'account activated success fully, login to continue'
+  });
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
