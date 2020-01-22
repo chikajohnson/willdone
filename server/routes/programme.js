@@ -1,22 +1,28 @@
 const express = require('express');
 const programmeController = require('../controllers/programmeController');
 const authController = require('../controllers/authController');
+const { stationAdmin, parishAdmin, superAdmin } = require('../utils/roles');
+
 
 const router = express.Router();
 
-// Protect all routes after this middleware
-//router.use(authController.protect);
+router
+  .route('/')
+  .get(programmeController.getAllProgramme);
+router
+  .route('/:id')
+  .get(programmeController.getProgramme);
 
-//router.use(authController.restrictTo('admin'));
+// Protect all routes after this middleware
+router.use(authController.protect);
+router.use(authController.restrictTo(stationAdmin, parishAdmin, superAdmin));
 
 router
   .route('/')
-  .get(programmeController.getAllProgramme)
   .post(programmeController.createProgramme);
 
 router
   .route('/:id')
-  .get(programmeController.getProgramme)
   .patch(programmeController.updateProgramme)
   .delete(programmeController.deleteProgramme);
 

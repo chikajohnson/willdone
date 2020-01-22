@@ -5,6 +5,7 @@ const User = require('../db/models/user');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const { sendActivationToken } = require('../utils/email');
+const { developer } = require('../utils/roles');
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -37,11 +38,23 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  //check if user with email already exists
+  if ( await User.findOne({ email : req.body.email })) {
+    return next(
+      new AppError(`User with email '${req.body.email}' already exists`, 400))
+  }
+  else if  ( await User.findOne({ phoneNumber: req.body.phoneNumber })) {
+    return next(
+      new AppError(`User with email '${req.body.phoneNumber}' already exists`, 400 ));
+  }
+  //check if user with ophonenumber already exists
+
   const newUser = await User.create(req.body);
 
-   //Generate the random activation token
-   const activationToken = newUser.createActivationToken();
-   await newUser.save({ validateBeforeSave: false });
+  //Generate the random activation token
+  const activationToken = newUser.createActivationToken();
+  await newUser.save({ validateBeforeSave: false });
+
   try {
     const activationURL = `${req.protocol}://${req.get(
       'host'
@@ -64,7 +77,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  console.log(req.body);
+  console.log("body = ", req.body);
 
   // 1) Check if email and password exist
   if (!email || !password) {
@@ -73,7 +86,7 @@ exports.login = catchAsync(async (req, res, next) => {
   // 2) Check if user exists && password is correct
   const user = await User.findOne({ email });
 
-  console.log(user);
+  console.log("user", user);
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
@@ -171,8 +184,11 @@ exports.isLoggedIn = async (req, res, next) => {
 };
 
 exports.restrictTo = (...roles) => {
+  
   return (req, res, next) => {
-    // roles ['admin', 'lead-guide']. role='user'
+    roles.push(developer)
+    console.log("roles", roles,  req.user.role);
+
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError('You do not have permission to perform this action', 403)
@@ -261,7 +277,7 @@ exports.activateAccount = catchAsync(async (req, res, next) => {
   });
 
   console.log("USER", user);
-  
+
 
   // 2) If token has not expired, and there is user, activate account
   if (!user) {
