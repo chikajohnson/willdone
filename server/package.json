@@ -9,9 +9,14 @@
     "start:prod": "NODE_ENV=production nodemon server.js",
     "debug": "ndb server.js",
     "seed": "node seeds/seed.js",
-    "test": "jest --watchAll --verbose"
+    "test": "jest --watch"
   },
-  "keywords": ["THE WAY", "parish", "nodejs", "api"],
+  "keywords": [
+    "THE WAY",
+    "parish",
+    "nodejs",
+    "api"
+  ],
   "author": "chikajohnson",
   "license": "ISC",
   "dependencies": {
@@ -49,7 +54,7 @@
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
-    "jest": "^22.2.2",
+    "jest": "^22.4.4",
     "supertest": "^3.0.0"
   }
 }
