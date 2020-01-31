@@ -1,18 +1,18 @@
 const app = require('../app');
 const supertest = require('supertest');
-const request = supertest(app)
+const request = supertest(app);
 
 const User = require('../db/models/user');
-const { setupDB } = require('./init/dbsetup');
+const { setupDb: setupDB } = require('./init/dbsetup');
 
-setupDB(process.env.DB_TEST, true)
+setupDB(process.env.DB_TEST, true);
 
 it('Should signup a user', async done => {
-    const res = await request.post('/signup')
+    const res = await request.post('/api/v1/auth/signup')
         .send({
             firstName: "Jones",
             lastName: "Emeka",
-            email: "chika@gmail.com",
+            email: "chikamadu@gmail.com",
             phoneNumber: "0898283832",
             dateOfBirth: "2009-12-12",
             placeOfBirth: "Ipaja",
@@ -20,16 +20,17 @@ it('Should signup a user', async done => {
             gender: "male",
             password: "!pass4sure",
             confirmPassword: "!pass4sure"
-        })
+        });
 
+    const { data: response } = res.body
     // Ensures response contains name and email
-    expect(res.body.name).toBeTruthy()
-    expect(res.body.email).toBeTruthy()
+    expect(response.firstName).toBeTruthy()
+    expect(response.email).toBeTruthy()
 
-    // Searches the user in the database
-    const user = await User.findOne({ email: 'chika@gmail.com' })
-    expect(user.name).toBeTruthy();
+    // fetch created user
+    const user = await User.findOne({ email: response.email })
+    expect(user.firstName).toBeTruthy();
     expect(user.email).toBeTruthy();
-    
+
     done()
 })

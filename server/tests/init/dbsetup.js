@@ -1,4 +1,4 @@
-const { seedDatabase } = require('./seeds')
+// const { seedDatabase } = require('./seeds')
 const mongoose = require('mongoose')
 mongoose.set('useCreateIndex', true)
 mongoose.promise = global.Promise
@@ -18,37 +18,37 @@ async function dropAllCollections () {
     try {
       await collection.drop()
     } catch (error) {
-      // Sometimes this error happens, but you can safely ignore it
-      if (error.message === 'ns not found') return
+      //Sometimes this error happens, but you can safely ignore it
+      if (error.message === '>>> ns not found') return
       // This error occurs when you use it.todo. You can
       // safely ignore this error too
-      if (error.message.includes('a background operation is currently running')) return
-      console.log(error.message)
+      if (error.message.includes('>>> A background operation is currently running')) return
+      //console.log(error.message)
     }
   }
 }
 
 module.exports = {
-  setupDB (db, runSaveMiddleware = false) {
+  setupDb (db) {
     // Connect to Mongoose
     beforeAll(async () => {
       await mongoose.connect(db, { useNewUrlParser: true })
     })
 
-    // Seeds database before each test
+    // seeds database before each test
     beforeEach(async () => {
-      await seedDatabase(runSaveMiddleware)
-    })
+      // await seedDatabase(runSaveMiddleware)
+    });
 
-    // Cleans up database between each test
+    //Cleans up database between each test
     afterEach(async () => {
       await removeAllCollections()
-    })
+    });
 
-    // Disconnect Mongoose
+    //Disconnect Mongoose
     afterAll(async () => {
       await dropAllCollections()
       await mongoose.connection.close()
-    })
+    });
   }
 }

@@ -31,21 +31,19 @@ const createSendToken = (user, statusCode, req, res) => {
   res.status(statusCode).json({
     status: 'success',
     token,
-    data: {
-      user
-    }
+    data: user
   });
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
   //check if user with email already exists
-  if ( await User.findOne({ email : req.body.email })) {
+  if (await User.findOne({ email: req.body.email })) {
     return next(
       new AppError(`User with email '${req.body.email}' already exists`, 400))
   }
-  else if  ( await User.findOne({ phoneNumber: req.body.phoneNumber })) {
+  else if (await User.findOne({ phoneNumber: req.body.phoneNumber })) {
     return next(
-      new AppError(`User with email '${req.body.phoneNumber}' already exists`, 400 ));
+      new AppError(`User with email '${req.body.phoneNumber}' already exists`, 400));
   }
   //check if user with ophonenumber already exists
 
@@ -55,23 +53,30 @@ exports.signup = catchAsync(async (req, res, next) => {
   const activationToken = newUser.createActivationToken();
   await newUser.save({ validateBeforeSave: false });
 
-  try {
-    const activationURL = `${req.protocol}://${req.get(
-      'host'
-    )}/api/v1/auth/activate/${activationToken}`;
-    await sendActivationToken(newUser.email, newUser.firstName, activationURL);
+  //await sendActivationToken(newUser.email, newUser.firstName, activationURL);
 
-    createSendToken(newUser, 201, req, res);
-  } catch (err) {
-    newUser.activateAccount = undefined;
-    newUser.activationExpires = undefined;
-    await newUser.save({ validateBeforeSave: false });
+  createSendToken(newUser, 201, req, res);
+  newUser.activateAccount = undefined;
+  newUser.activationExpires = undefined;
+  await newUser.save({ validateBeforeSave: false });
 
-    return next(
-      new AppError('There was an error sending the email. Try again later!'),
-      500
-    );
-  }
+  // try {
+  //   const activationURL = `${req.protocol}://${req.get(
+  //     'host'
+  //   )}/api/v1/auth/activate/${activationToken}`;
+  //   await sendActivationToken(newUser.email, newUser.firstName, activationURL);
+
+  //   createSendToken(newUser, 201, req, res);
+  // } catch (err) {
+  //   newUser.activateAccount = undefined;
+  //   newUser.activationExpires = undefined;
+  //   await newUser.save({ validateBeforeSave: false });
+
+  //   return next(
+  //     new AppError('There was an error sending the email. Try again later!'),
+  //     500
+  //   );
+  // }
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -184,10 +189,10 @@ exports.isLoggedIn = async (req, res, next) => {
 };
 
 exports.restrictTo = (...roles) => {
-  
+
   return (req, res, next) => {
     roles.push(developer)
-    console.log("roles", roles,  req.user.role);
+    console.log("roles", roles, req.user.role);
 
     if (!roles.includes(req.user.role)) {
       return next(
