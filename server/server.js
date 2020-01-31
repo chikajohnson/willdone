@@ -11,6 +11,7 @@ process.on('uncaughtException', err => {
 const app = require('./app');
 
 const port = process.env.PORT || 3000;
+console.log(process.env.NODE_ENV);
 const server = app.listen(port, () => {
   console.log(`App running on port ${port}...`);
   winston.info(`Listening on dedicated port  ${port}...`);

@@ -19,7 +19,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const app = express();
 
 dotenv.config({
-  path: '.env'
+  path: './config/.env'
 });
 
 app.enable('trust proxy');
@@ -46,7 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(helmet());
 
 // Development logging
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'testing') {
   app.use(morgan('dev'));
 }
 
